@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Auth Debug - Zephyr</title>
+  <link rel="stylesheet" href="premium-theme.css">
+  <style>
+    body {
+      padding: 20px;
+      font-family: Arial, sans-serif;
+    }
+    .debug-container {
+      background: #f0f0f0;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .debug-section {
+      background: white;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 4px;
+      border-left: 4px solid #0066cc;
+    }
+    .debug-item {
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .debug-item:last-child {
+      border-bottom: none;
+    }
+    .label {
+      font-weight: bold;
+      color: #333;
+    }
+    .value {
+      color: #666;
+      margin-top: 4px;
+      word-break: break-all;
+      background: #fafafa;
+      padding: 8px;
+      border-radius: 3px;
+      font-family: monospace;
+      font-size: 12px;
+    }
+    .status-logged-in {
+      background: #d4edda;
+      border-left-color: #28a745;
+      color: #155724;
+    }
+    .status-logged-out {
+      background: #f8d7da;
+      border-left-color: #dc3545;
+      color: #721c24;
+    }
+    button {
+      background: #0066cc;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin: 5px;
+    }
+    button:hover {
+      background: #0052a3;
+    }
+    .console-output {
+      background: #1e1e1e;
+      color: #00ff00;
+      padding: 15px;
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      max-height: 300px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+  </style>
+</head>
+<body>
+  <div class="debug-container">
+    <h1>🔍 Zephyr Authentication Debug</h1>
+    
+    <div class="debug-section" id="authStatus">
+      <h2>Auth Status</h2>
+      <div class="debug-item">
+        <span class="label">Login Status:</span>
+        <div class="value" id="loginStatus">Loading...</div>
+      </div>
+      <div class="debug-item">
+        <span class="label">User Info:</span>
+        <div class="value" id="userInfo">Loading...</div>
+      </div>
+    </div>
+
+    <div class="debug-section">
+      <h2>localStorage</h2>
+      <div class="debug-item">
+        <span class="label">zephyrUserLoggedIn:</span>
+        <div class="value" id="storageLoggedIn">N/A</div>
+      </div>
+      <div class="debug-item">
+        <span class="label">zephyrUserInfo:</span>
+        <div class="value" id="storageUserInfo">N/A</div>
+      </div>
+    </div>
+
+    <div class="debug-section">
+      <h2>Actions</h2>
+      <button onclick="testLogin()">Test Login</button>
+      <button onclick="testLogout()">Test Logout</button>
+      <button onclick="clearDebugLog()">Clear Log</button>
+      <button onclick="location.reload()">Refresh Page</button>
+      <button onclick="goToHome()">Go to Homepage</button>
+    </div>
+
+    <div class="debug-section">
+      <h2>Console Output</h2>
+      <div class="console-output" id="debugLog"></div>
+    </div>
+  </div>
+
+  <script src="auth-state.js"></script>
+  <script>
+    // Intercept console.log to show in page
+    const originalLog = console.log;
+    const debugLog = document.getElementById('debugLog');
+    
+    console.log = function(...args) {
+      originalLog.apply(console, args);
+      const timestamp = new Date().toLocaleTimeString();
+      const message = args.map(arg => 
+        typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+      ).join(' ');
+      debugLog.textContent += `[${timestamp}] ${message}\n`;
+      debugLog.scrollTop = debugLog.scrollHeight;
+    };
+
+    // Update auth status display
+    function updateDebugInfo() {
+      const loggedIn = isUserLoggedIn();
+      const user = getCurrentUser();
+      
+      const statusDiv = document.getElementById('authStatus');
+      statusDiv.className = 'debug-section ' + (loggedIn ? 'status-logged-in' : 'status-logged-out');
+      
+      document.getElementById('loginStatus').textContent = loggedIn ? '✅ Logged In' : '❌ Logged Out';
+      document.getElementById('userInfo').textContent = user ? JSON.stringify(user, null, 2) : 'No user data';
+      
+      document.getElementById('storageLoggedIn').textContent = localStorage.getItem('zephyrUserLoggedIn') || 'undefined';
+      document.getElementById('storageUserInfo').textContent = localStorage.getItem('zephyrUserInfo') || 'undefined';
+    }
+
+    // Test functions
+    function testLogin() {
+      console.log('\n🧪 Running test login...');
+      setUserLoggedIn('test@example.com', 'Test', 'User');
+      updateDebugInfo();
+      console.log('✅ Test login complete');
+    }
+
+    function testLogout() {
+      console.log('\n🧪 Running test logout...');
+      logoutUser();
+      updateDebugInfo();
+    }
+
+    function clearDebugLog() {
+      document.getElementById('debugLog').textContent = '';
+    }
+
+    function goToHome() {
+      window.location.href = 'index.html';
+    }
+
+    // Initial update
+    console.log('🎯 Debug page loaded');
+    updateDebugInfo();
+
+    // Update every 2 seconds
+    setInterval(updateDebugInfo, 2000);
+  </script>
+</body>
+</html>
