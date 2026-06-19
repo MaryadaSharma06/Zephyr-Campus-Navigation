@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Zephyr Photo Gallery</title>
 <link rel="stylesheet" href="premium-theme.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<script src="https://unpkg.com/lucide@latest"></script>
 <style>
 *{
     margin:0;
@@ -15,6 +17,7 @@
 
 body{
     background:#f5f5f5;
+    padding-top: 70px;
 }
 
 header{
@@ -22,6 +25,7 @@ header{
     padding:20px;
     text-align:center;
     box-shadow:0 2px 5px rgba(0,0,0,0.1);
+    margin-top: 20px;
 }
 
 header h1{
@@ -82,6 +86,37 @@ header h1{
 
 <body>
 
+<nav class="navbar">
+  <div class="nav-container">
+    <div class="nav-logo">
+      <img src="IMG_4164 (1).PNG" alt="Zephyr Logo" class="logo-image">
+      <span>Zephyr</span>
+    </div>
+    
+    <div class="nav-links">
+      <a href="homepage.html">Home</a>
+      <a href="feedback.html">Feedback</a>
+      <a href="aboutus.html">About Us</a>
+      <a href="login-signup.html">
+        <button class="sign-in-btn">LOGIN / SIGNUP</button>
+      </a>
+    </div>
+
+    <button class="menu-btn">
+      <i data-lucide="menu"></i>
+    </button>
+  </div>
+</nav>
+
+<div class="mobile-menu">
+  <a href="homepage.html">Home</a>
+  <a href="feedback.html">Feedback</a>
+  <a href="aboutus.html">About Us</a>
+  <a href="login-signup.html">
+    <button class="sign-in-btn">LOGIN / SIGNUP</button>
+  </a>
+</div>
+
 <header>
     <h1>Campus Photo Gallery</h1>
     <p>Explore the beauty of BMU Campus</p>
@@ -89,12 +124,14 @@ header h1{
 
 <div class="gallery">
 
-    <img src="images/campus1.jpg" alt="Campus">
-    <img src="images/campus2.jpg" alt="Campus">
-    <img src="images/campus3.jpg" alt="Campus">
-    <img src="images/campus4.jpg" alt="Campus">
-    <img src="images/campus5.jpg" alt="Campus">
-    <img src="images/campus6.jpg" alt="Campus">
+    <img src="Photogallery2.jpeg" alt="Campus">
+    <img src="Photogallery3.jpeg" alt="Campus">
+    <img src="Photogallery4.jpeg" alt="Campus">
+    <img src="Photogallery5.jpeg" alt="Campus">
+    <img src="Photogallery6.jpeg" alt="Campus">
+    <img src="Photogallery7.jpeg" alt="Campus">
+    <img src="Photogallery8.jpeg" alt="Campus">
+    <img src="Photogallery9.jpeg" alt="Campus">
 
 </div>
 
@@ -127,5 +164,6 @@ lightbox.addEventListener('click',(e)=>{
 });
 </script>
 
+<script src="auth-state.js"></script>
 </body>
 </html>

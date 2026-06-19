@@ -224,7 +224,9 @@
           const directionsRenderer = new google.maps.DirectionsRenderer({
             suppressMarkers: true // This hides the default A/B markers
           });
-          strokeColor: "#4285F4", // Google Maps blue color
+          directionsRenderer.setOptions({
+            strokeColor: "#4285F4" // Google Maps blue color
+          })
           directionsRenderer.setMap(map);
 
           directionsService.route(

@@ -1,3 +1,6 @@
+// Backend API URL (change this if backend is on different port/server)
+const API_URL = 'http://localhost:5000/api';
+
 // Form Switching
 function switchForm(e) {
   e.preventDefault();
@@ -25,8 +28,8 @@ function togglePasswordVisibility(inputId) {
   }
 }
 
-// Handle Login
-document.getElementById('loginFormElement').addEventListener('submit', function(e) {
+// Handle Login - Call Backend API
+document.getElementById('loginFormElement').addEventListener('submit', async function(e) {
   e.preventDefault();
   
   const email = document.getElementById('login-email').value;
@@ -38,21 +41,42 @@ document.getElementById('loginFormElement').addEventListener('submit', function(
     return;
   }
   
-  // Simulate login (in production, this would be an API call)
-  console.log('Login attempt:', { email, password });
-  
-  // Store user login state
-  setUserLoggedIn(email, email.split('@')[0]);
-  
-  showSuccessModal(
-    'Welcome Back!',
-    'You have successfully signed in. Redirecting to homepage...',
-    () => window.location.href = 'index.html'
-  );
+  try {
+    showLoading('Logging in...');
+    
+    const response = await fetch(`${API_URL}/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email, password })
+    });
+    
+    const data = await response.json();
+    hideLoading();
+    
+    if (data.success) {
+      // Store user login state from backend response
+      setUserLoggedIn(data.user.email, data.user.firstName, data.user.lastName);
+      
+      showSuccessModal(
+        'Welcome Back!',
+        'You have successfully signed in. Redirecting to homepage...',
+        () => window.location.href = 'index.html'
+      );
+    } else {
+      showError(data.message || 'Login failed');
+    }
+    
+  } catch (error) {
+    hideLoading();
+    console.error('Login error:', error);
+    showError('Could not connect to server. Make sure backend is running on http://localhost:5000');
+  }
 });
 
-// Handle Signup
-document.getElementById('signupFormElement').addEventListener('submit', function(e) {
+// Handle Signup - Call Backend API
+document.getElementById('signupFormElement').addEventListener('submit', async function(e) {
   e.preventDefault();
   
   const firstName = document.getElementById('signup-fname').value;
@@ -88,17 +112,38 @@ document.getElementById('signupFormElement').addEventListener('submit', function
     return;
   }
   
-  // Simulate signup (in production, this would be an API call)
-  console.log('Signup attempt:', { firstName, lastName, email });
-  
-  // Store user login state with name
-  setUserLoggedIn(email, firstName, lastName);
-  
-  showSuccessModal(
-    'Account Created Successfully!',
-    'Welcome to Zephyr! Your account has been created. Redirecting to homepage...',
-    () => window.location.href = 'index.html'
-  );
+  try {
+    showLoading('Creating account...');
+    
+    const response = await fetch(`${API_URL}/auth/signup`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email, firstName, lastName, password, confirmPassword })
+    });
+    
+    const data = await response.json();
+    hideLoading();
+    
+    if (data.success) {
+      // Store user login state from backend response
+      setUserLoggedIn(data.user.email, data.user.firstName, data.user.lastName);
+      
+      showSuccessModal(
+        'Account Created Successfully!',
+        'Welcome to Zephyr! Your account has been created. Redirecting to homepage...',
+        () => window.location.href = 'index.html'
+      );
+    } else {
+      showError(data.message || 'Signup failed');
+    }
+    
+  } catch (error) {
+    hideLoading();
+    console.error('Signup error:', error);
+    showError('Could not connect to server. Make sure backend is running on http://localhost:5000');
+  }
 });
 
 // Validate Password Strength
@@ -126,6 +171,33 @@ function showError(message) {
   setTimeout(() => {
     errorElement.style.display = 'none';
   }, 5000);
+}
+
+// Show Loading Message
+function showLoading(message = 'Loading...') {
+  let loadingElement = document.querySelector('.loading-message');
+  if (!loadingElement) {
+    loadingElement = document.createElement('div');
+    loadingElement.className = 'loading-message';
+    const formContainer = document.querySelector('.auth-form.active');
+    formContainer.insertBefore(loadingElement, formContainer.firstChild);
+  }
+  
+  loadingElement.innerHTML = `
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <div style="width: 20px; height: 20px; border: 3px solid #ddd; border-top: 3px solid #0066cc; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+      <span>${message}</span>
+    </div>
+  `;
+  loadingElement.style.display = 'block';
+}
+
+// Hide Loading Message
+function hideLoading() {
+  const loadingElement = document.querySelector('.loading-message');
+  if (loadingElement) {
+    loadingElement.style.display = 'none';
+  }
 }
 
 // Show Success Modal

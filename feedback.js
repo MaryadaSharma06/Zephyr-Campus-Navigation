@@ -1,5 +1,8 @@
-// Function to handle form submission and send to Google Sheets
-document.getElementById('feedbackForm').addEventListener('submit', function(e) {
+// Backend API URL
+const API_URL = 'http://localhost:5000/api';
+
+// Function to handle form submission
+document.getElementById('feedbackForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     
     // Show loading state
@@ -9,75 +12,106 @@ document.getElementById('feedbackForm').addEventListener('submit', function(e) {
     submitButton.disabled = true;
     
     // Get form data
-    const formData = {
-        name: document.getElementById('name').value,
-        email: document.getElementById('email').value || 'Not provided',
-        feedback: document.getElementById('feedback').value,
-        source: document.getElementById('find').value || 'Not specified',
-        timestamp: new Date().toLocaleString()
+    const name = document.getElementById('name').value;
+    const email = document.getElementById('email').value || 'Anonymous';
+    const locationName = document.getElementById('location')?.value || 'Campus';
+    const rating = document.getElementById('rating')?.value || 0;
+    const message = document.getElementById('feedback').value;
+    
+    // Get user info if logged in
+    const user = getCurrentUser?.() || null;
+    
+    const feedbackData = {
+        userId: user?.id || null,
+        email: user?.email || email,
+        firstName: user?.firstName || name.split(' ')[0],
+        lastName: user?.lastName || name.split(' ')[1] || '',
+        locationName: locationName,
+        rating: parseInt(rating),
+        message: message
     };
     
-    // The URL for the Google Apps Script web app
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbzUvecs3dbw9Jo80kf98negL_pRDaoXMxQ8hE4BIhUSChDhtlWfzKis33n0W8316PVL/exec';
-    
-    // Convert form data to URL parameters
-    const urlParams = new URLSearchParams();
-    Object.keys(formData).forEach(key => {
-        urlParams.append(key, formData[key]);
-    });
-    
-    // Send data to Google Sheets via the web app
-    fetch(scriptURL + '?' + urlParams.toString(), {
-        method: 'GET',
-        mode: 'no-cors',
-    })
-    .then(() => {
-        // Show success message with animation
-        const formSection = document.querySelector('.form-section');
-        const successMessage = document.createElement('div');
-        successMessage.className = 'success-message';
-        successMessage.innerHTML = `
-            <div class="success-icon"><i class="fas fa-check-circle"></i></div>
-            <h3>Thank You!</h3>
-            <p>Your feedback has been submitted successfully.</p>
-        `;
+    try {
+        // Save to backend
+        const response = await fetch(`${API_URL}/feedback/submit`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(feedbackData)
+        });
         
-        // Add success message to the form
-        this.style.display = 'none';
-        formSection.appendChild(successMessage);
+        const data = await response.json();
         
-        // Restore form after 5 seconds
-        setTimeout(() => {
-            this.reset();
-            this.style.display = 'flex';
-            formSection.removeChild(successMessage);
-            submitButton.innerHTML = originalButtonText;
-            submitButton.disabled = false;
-        }, 5000);
-        
-        // Also save to local storage as backup
-        const feedbacks = JSON.parse(localStorage.getItem('feedbacks') || '[]');
-        feedbacks.push(formData);
-        localStorage.setItem('feedbacks', JSON.stringify(feedbacks));
-    })
-    .catch(error => {
-        console.error('Error submitting form:', error);
+        if (data.success) {
+            console.log('✅ Feedback saved to backend:', data);
+            
+            // Hide form
+            this.style.display = 'none';
+            
+            // Show success message with animation
+            const formSection = document.querySelector('.form-section');
+            const successMessage = document.createElement('div');
+            successMessage.className = 'success-message';
+            successMessage.style.cssText = `
+                text-align: center;
+                padding: 40px 20px;
+                background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                color: white;
+                border-radius: 12px;
+                animation: slideUp 0.5s ease-out;
+            `;
+            successMessage.innerHTML = `
+                <div class="success-icon" style="font-size: 3rem; margin-bottom: 20px;">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h3 style="font-size: 1.8rem; margin: 10px 0; color: white;">Thank You!</h3>
+                <p style="font-size: 1rem; margin: 10px 0; color: rgba(255,255,255,0.95);">Your feedback has been submitted successfully.</p>
+                <p style="font-size: 0.9rem; margin-top: 15px; color: rgba(255,255,255,0.8);">We appreciate your valuable input! 🎉</p>
+            `;
+            
+            // Add success message to the form
+            formSection.appendChild(successMessage);
+            
+            // Restore form after 5 seconds
+            setTimeout(() => {
+                successMessage.remove();
+                this.reset();
+                this.style.display = 'block';
+                submitButton.innerHTML = originalButtonText;
+                submitButton.disabled = false;
+            }, 5000);
+        } else {
+            throw new Error(data.message || 'Failed to submit feedback');
+        }
+    } catch (error) {
+        console.error('❌ Feedback error:', error);
         
         // Show error message
-        submitButton.innerHTML = 'Error! Try Again';
-        submitButton.classList.add('error');
+        const errorDiv = document.createElement('div');
+        errorDiv.style.cssText = `
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            border-left: 4px solid #f5c6cb;
+        `;
+        errorDiv.innerHTML = `
+            <strong>⚠️ Error:</strong> ${error.message}
+            <br><small>Make sure the backend is running on http://localhost:5000</small>
+        `;
         
+        this.insertBefore(errorDiv, this.firstChild);
+        
+        // Remove error after 5 seconds
         setTimeout(() => {
-            submitButton.innerHTML = originalButtonText;
-            submitButton.classList.remove('error');
-            submitButton.disabled = false;
-        }, 3000);
+            errorDiv.remove();
+        }, 5000);
         
-        // Save to local storage as fallback
-        const feedbacks = JSON.parse(localStorage.getItem('feedbacks') || '[]');
-        feedbacks.push(formData);
-        localStorage.setItem('feedbacks', JSON.stringify(feedbacks));
-    });
+        submitButton.innerHTML = originalButtonText;
+        submitButton.disabled = false;
+    }
 });
 
 // Admin functionality (triggered with Ctrl+Shift+Z)

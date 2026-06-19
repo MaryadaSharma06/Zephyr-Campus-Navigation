@@ -1,0 +1,26 @@
+{
+  "name": "zephyr-campus-app-backend",
+  "version": "1.0.0",
+  "description": "Simple backend for Zephyr Campus Navigation App - Demo & Learning",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": [
+    "zephyr",
+    "campus",
+    "navigation",
+    "demo"
+  ],
+  "author": "Zephyr Team",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "body-parser": "^1.20.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}

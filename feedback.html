@@ -7,8 +7,9 @@ html
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Zephyr Feedback</title>
   <link rel="stylesheet" href="feedback.css"/>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <link rel="stylesheet" href="premium-theme.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
   <nav class="navbar">
@@ -30,6 +31,8 @@ html
     </div>
   </nav>
 
+
+
   <div class="container">
     <div class="form-section">
       <h1>Get in <span class="highlight">Touch</span></h1>
@@ -37,14 +40,32 @@ html
       <form id="feedbackForm">
         <input type="text" id="name" name="name" placeholder="Name *" required />
         <input type="email" id="email" name="email" placeholder="Email" />
-        <textarea id="feedback" name="feedback" placeholder="Your Feedback *" required rows="4"></textarea>
-        <select id="find" name="find">
-          <option value="">How did you Find Us?</option>
-          <option value="social">Social Media</option>
-          <option value="friend">Friend</option>
-          <option value="college">College</option>
-          <option value="other">Other</option>
+        
+        <select id="location" name="location" required>
+          <option value="">Select a Location *</option>
+          <option value="Library">Library</option>
+          <option value="Cafeteria">Cafeteria</option>
+          <option value="Hostel">Hostel</option>
+          <option value="Classroom">Classroom</option>
+          <option value="Auditorium">Auditorium</option>
+          <option value="Reception">Reception</option>
+          <option value="Other">Other</option>
         </select>
+
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <label for="rating" style="margin: 0;">Rate Your Experience:</label>
+          <select id="rating" name="rating">
+            <option value="0">No Rating</option>
+            <option value="1">⭐ 1 Star</option>
+            <option value="2">⭐⭐ 2 Stars</option>
+            <option value="3">⭐⭐⭐ 3 Stars</option>
+            <option value="4">⭐⭐⭐⭐ 4 Stars</option>
+            <option value="5">⭐⭐⭐⭐⭐ 5 Stars</option>
+          </select>
+        </div>
+        
+        <textarea id="feedback" name="feedback" placeholder="Your Feedback *" required rows="4"></textarea>
+        
         <button type="submit">SEND</button>
       </form>
 

@@ -37,9 +37,9 @@
       </header>
 
     <section class="gallery">
-        <img src="smoothie 1.jpeg" alt="Smoothie Point Image 1">
-        <img src="smoothie_2.jpeg" alt="Smoothie Point Image 2">
-        <img src="image 3.jpeg" alt="Smoothie Point Image 3">
+        <img src="sp1.jpeg" alt="Smoothie Point Image 1">
+        <img src="sp2.jpeg" alt="Smoothie Point Image 2">
+        <img src="sp3.jpeg" alt="Smoothie Point Image 3">
     </section>
 
     <div class="route-info">
@@ -223,7 +223,9 @@
               const directionsRenderer = new google.maps.DirectionsRenderer({
                 suppressMarkers: true // This hides the default A/B markers
               });
-              strokeColor: "#4285F4", // Google Maps blue color
+              directionsRenderer.setOptions({
+                strokeColor: "#4285F4" // Google Maps blue color
+              });
               directionsRenderer.setMap(map);
     
               directionsService.route(
